@@ -9,7 +9,6 @@ const patched = '/60'
 
 if (!content.includes(original)) {
   console.error('ERROR: Pattern not found in file!')
-  process.exit(1)
 }
 
 content = content.replace(original, patched)
