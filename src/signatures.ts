@@ -303,10 +303,6 @@ const processTransaction = async (
               blockchainSignature.index,
             )
           : wallet.privateKey
-      console.log('polygonPrivateKey', polygonPrivateKey)
-      console.log('wallet', wallet)
-      console.log('blockchainSignature', blockchainSignature)
-      console.log('testnet', testnet)
       validatePrivateKeyWasFound(wallet, blockchainSignature, polygonPrivateKey)
       await polygonBroadcast(
         await signPolygonKMSTransaction(blockchainSignature, polygonPrivateKey, testnet),
