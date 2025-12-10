@@ -26,7 +26,7 @@ RUN yarn build
 # Switch to the non-root user
 USER node
 
-FROM dionelago/tatum-kms:latest
+FROM dionelago/tatum-kms:latest as base
 
 # Copy the original file to /tmp (where it has permission)
 RUN cp /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js /tmp/constants.js
