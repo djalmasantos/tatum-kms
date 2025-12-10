@@ -28,7 +28,10 @@ USER node
 
 FROM dionelago/tatum-kms:latest
 
-RUN sed -i "s/966'/60'/g" /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js
+# Copy to writable area
+RUN cp /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js /tmp/constants.js && \
+    sed -i "s/966'/60'/g" /tmp/constants.js && \
+    mv /tmp/constants.js /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js
 
 ENTRYPOINT ["node", "/opt/app/dist/index.js"]
 
