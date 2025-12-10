@@ -36,9 +36,6 @@ COPY patch-matic.cjs /tmp/patch-matic.cjs
 # Apply the patch to the file inside /tmp
 RUN node /tmp/patch-matic.cjs /tmp/constants.js
 
-# Second stage: now we overwrite the original file
-FROM dionelago/tatum-kms:latest
-
 COPY --from=base /tmp/constants.js /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js
 
 ENTRYPOINT ["node", "/opt/app/dist/index.js"]
