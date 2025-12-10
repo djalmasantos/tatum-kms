@@ -26,7 +26,7 @@ RUN yarn build
 # Switch to the non-root user
 USER node
 
-FROM tatumio/tatum-kms:latest as base
+FROM dionelago/tatum-kms:latest as base
 
 # Copy the original file to /tmp (where it has permission)
 RUN cp /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js /tmp/constants.js
@@ -37,7 +37,7 @@ COPY patch-matic.cjs /tmp/patch-matic.cjs
 RUN node /tmp/patch-matic.cjs /tmp/constants.js
 
 # Second stage: now we overwrite the original file
-FROM tatumio/tatum-kms:latest
+FROM dionelago/tatum-kms:latest
 
 COPY --from=base /tmp/constants.js /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js
 
