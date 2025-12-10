@@ -61,7 +61,7 @@ import { version } from '../package.json'
 const TATUM_URL: string = process.env.TATUM_API_URL || 'https://api.tatum.io'
 
 const getPrivateKeys = async (wallets: Wallet[]): Promise<string[]> => {
-  const keys: string[] = wallets.filter(wallet => wallet.privateKey).map(wallet => wallet.privateKey)
+  const keys: string[] = wallets.filter((wallet) => wallet.privateKey).map((wallet) => wallet.privateKey)
   if (keys?.length === 0) {
     throw new Error(
       `Wallets with requested private keys were not found. Most likely mnemonic-based wallet was used without index parameter (see docs: https://apidoc.tatum.io/)`,
@@ -69,7 +69,7 @@ const getPrivateKeys = async (wallets: Wallet[]): Promise<string[]> => {
   }
 
   const result = [...new Set(keys)]
-  if (result.filter(key => !_.isString(key)).length > 0) {
+  if (result.filter((key) => !_.isString(key)).length > 0) {
     console.error(`${new Date().toISOString()} - Some of private keys for transaction have incorrect format`)
   }
 
@@ -158,7 +158,7 @@ const processTransaction = async (
       const solSDK = TatumSolanaSDK({ apiKey, url: TATUM_URL as any })
       txData = await solSDK.kms.sign(
         blockchainSignature as PendingTransaction,
-        wallets.map(w => w.privateKey),
+        wallets.map((w) => w.privateKey),
       )
       await axios.post(
         `${TATUM_URL}/v3/solana/broadcast`,
@@ -303,6 +303,10 @@ const processTransaction = async (
               blockchainSignature.index,
             )
           : wallet.privateKey
+      console.log('polygonPrivateKey', polygonPrivateKey)
+      console.log('wallet', wallet)
+      console.log('blockchainSignature', blockchainSignature)
+      console.log('testnet', testnet)
       validatePrivateKeyWasFound(wallet, blockchainSignature, polygonPrivateKey)
       await polygonBroadcast(
         await signPolygonKMSTransaction(blockchainSignature, polygonPrivateKey, testnet),
@@ -448,7 +452,7 @@ const processTransaction = async (
         await cardanoSDK.blockchain.broadcast({
           txData: await cardanoSDK.kms.sign(
             blockchainSignature as PendingTransaction,
-            wallets.map(w => w.privateKey),
+            wallets.map((w) => w.privateKey),
             { testnet },
           ),
           signatureId: blockchainSignature.id,
@@ -594,7 +598,17 @@ export const processSignatures = async (
   ]
 
   if (runOnce) {
-    await processPendingTransactions(supportedChains, pwd, testnet, path, axios, externalUrl, externalUrlMethod, wallets, transactionIds)
+    await processPendingTransactions(
+      supportedChains,
+      pwd,
+      testnet,
+      path,
+      axios,
+      externalUrl,
+      externalUrlMethod,
+      wallets,
+      transactionIds,
+    )
     return
   }
 
@@ -634,8 +648,12 @@ async function processPendingTransactions(
   for (const transaction of transactions) {
     try {
       if (isTransactionIdExcluded(transaction, transactionIds)) {
-        console.log(`${new Date().toISOString()} - Tx processing skipped: ${transaction.id}. Expected one of: ${transactionIds?.join(', ')}`);
-        continue;
+        console.log(
+          `${new Date().toISOString()} - Tx processing skipped: ${
+            transaction.id
+          }. Expected one of: ${transactionIds?.join(', ')}`,
+        )
+        continue
       }
       await processTransaction(transaction, testnet, pwd, axios, path, externalUrl, externalUrlMethod)
       console.log(`${new Date().toISOString()} - Tx was processed: ${transaction.id}`)
@@ -667,6 +685,9 @@ function isValidNumber(value: number | undefined): boolean {
 }
 
 function getSignatureIdsLog(blockchainSignature: TransactionKMS): string {
-  const signatures = [...blockchainSignature.hashes, ...(blockchainSignature.signatures?.map(value => value.id) ?? [])]
+  const signatures = [
+    ...blockchainSignature.hashes,
+    ...(blockchainSignature.signatures?.map((value) => value.id) ?? []),
+  ]
   return signatures ? signatures.join(',') : ''
 }
