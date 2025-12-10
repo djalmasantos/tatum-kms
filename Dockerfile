@@ -26,12 +26,20 @@ RUN yarn build
 # Switch to the non-root user
 USER node
 
+FROM dionelago/tatum-kms:latest as base
+
+# Copy the original file to /tmp (where it has permission)
+RUN cp /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js /tmp/constants.js
+
+COPY patch-matic.cjs /tmp/patch-matic.cjs
+
+# Apply the patch to the file inside /tmp
+RUN node /tmp/patch-matic.cjs /tmp/constants.js
+
+# Second stage: now we overwrite the original file
 FROM dionelago/tatum-kms:latest
 
-# Copy to writable area
-RUN cp /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js /tmp/constants.js && \
-    sed -i "s/966'/60'/g" /tmp/constants.js && \
-    mv /tmp/constants.js /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js
+COPY --from=base /tmp/constants.js /opt/app/node_modules/@tatumio/tatum/dist/src/constants.js
 
 ENTRYPOINT ["node", "/opt/app/dist/index.js"]
 
